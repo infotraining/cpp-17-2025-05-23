@@ -110,7 +110,7 @@ TEST_CASE("tuple")
     }
 }
 
-namespace BeforeCpp17
+namespace [[deprecated]] BeforeCpp17
 {
     tuple<int, int, double> calc_stats(const vector<int>& data)
     {
@@ -172,9 +172,7 @@ TEST_CASE("structured bindings")
     {
         std::map<std::string, int> dict = { {"one", 1}, {"two", 2} };
 
-        auto [pos, was_inserted] = dict.insert(std::make_pair("three", 3));
-
-        if (was_inserted)
+        if (auto [pos, was_inserted] = dict.insert(std::pair("three", 3)); was_inserted)
         {
             std::cout << pos->first << " was inserted to map...\n";
         }

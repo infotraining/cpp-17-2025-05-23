@@ -15,9 +15,7 @@ TEST_CASE("if with initializer")
 {
     std::vector vec = {1, 2, 543, 235, 534, 665, 654, 3456};
 
-    auto pos = std::find(begin(vec), end(vec), 665);
-
-    if (pos != end(vec))
+    if (auto pos = std::find(begin(vec), end(vec), 665); pos != end(vec))
     {
         std::cout << "Found: " << *pos << "\n";
     }

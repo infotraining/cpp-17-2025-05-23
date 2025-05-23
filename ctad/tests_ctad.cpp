@@ -5,44 +5,68 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <tuple>
+#include <memory>
+#include <functional>
 
 using namespace std;
+using namespace std::literals;
 
-void foo(int)
-{ }
-
-template <typename T>
-void deduce1(T arg)
+template <typename T1, typename T2>
+struct ValuePair
 {
-    puts(__PRETTY_FUNCTION__);
+    T1 fst;
+    T2 snd;
+
+    ValuePair(T1 f, T2 s) : fst{std::move(f)}, snd{std::move(s)}
+    {}
+};
+
+template <typename T1, typename T2>
+ValuePair<T1, T2> make_value_pair(T1 fst, T2 snd)
+{
+    return ValuePair<T1, T2>(std::move(fst), std::move(snd));
 }
 
-template <typename T>
-void deduce2(T& arg)
+int foo(int, int)
 {
-    puts(__PRETTY_FUNCTION__);
+    return 42;
 }
 
-template <typename T>
-void deduce3(T&& arg)
+TEST_CASE("CTAD - Class Template Arg Deduction")
 {
-    puts(__PRETTY_FUNCTION__);
+    ValuePair<int, double> vp1{42, 3.14};
+
+    auto vp2 = make_value_pair(42, 3.14);
+
+    ValuePair vp3{42, 3.14};  // CTAD
+
+    std::pair my_pair{42, 3.14};
+
+    std::tuple my_tuple{4, 24.444, "text"s};
+
+    std::vector vec = {1, 2, 3};
+
+    std::unique_ptr<int> my_ptr{new int(10)};
+
+    std::shared_ptr my_shared_ptr(std::move(my_ptr));
+
+    std::function f = foo;
 }
 
-TEST_CASE("Template Argument Deduction - case 1")
+template <typename T1, typename T2>
+struct AggregateValuePair
 {
-    int x = 10;
-    const int cx = 10;
-    int& ref_x = x;
-    const int& cref_x = cx;
-    int tab[10];
-}
+    T1 fst;
+    T2 snd;
+};
 
-TEST_CASE("Template Argument Deduction - case 2")
+// deductions guide
+template <typename T1, typename T2>
+AggregateValuePair(T1, T2) -> AggregateValuePair<T1, T2>;
+
+
+TEST_CASE("Aggregate + CTAD")
 {
-    int x = 10;
-    const int cx = 10;
-    int& ref_x = x;
-    const int& cref_x = cx;
-    int tab[10];
+    AggregateValuePair vp1{42, 3.24};
 }
